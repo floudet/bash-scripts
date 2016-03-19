@@ -26,7 +26,7 @@ _usage() {
 }
 
 # Test the validity of an IP address
-function _valid_ip() {
+_valid_ip() {
 
 	local  IP=$1
 	local  ISVALID=1
@@ -55,22 +55,22 @@ do
 		f)	FILE=$OPTARG
 			;;
 		c)
-		case "$OPTARG" in
-			"top-ips")
-				COMMAND="top-ips"
-				;;
-			"top-response-codes")
-				COMMAND="top-response-codes"
-				;;
-			"top-url-requests")
-				COMMAND="top-url-requests"
-				;;
-			*) 
-				echo "invalid command provided for -c"
-				_usage
-				;;
-		esac
-		;;
+			case "$OPTARG" in
+				"top-ips")
+					COMMAND="top-ips"
+					;;
+				"top-response-codes")
+					COMMAND="top-response-codes"
+					;;
+				"top-url-requests")
+					COMMAND="top-url-requests"
+					;;
+				*) 
+					echo "invalid command provided for -c"
+					_usage
+					;;
+			esac
+			;;
 		i)	IP=$OPTARG
 			;;
 		*)	_usage
