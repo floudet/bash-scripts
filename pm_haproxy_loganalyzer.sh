@@ -67,7 +67,7 @@ do
 				;;
 			*) 
 				echo "invalid command provided for -c"
-				_usage	
+				_usage
 				;;
 		esac
 		;;
@@ -84,13 +84,13 @@ if [[ ! -r $FILE ]];then
 	exit -1
 fi
 
-if [[ $COMMAND && $IP ]];then
-	echo "you cannot use -c with -i"
-	exit -1
+if [[ -z $COMMAND && -z $IP ]];then
+	echo "you must provide -c or -i"
+	_usage
 fi
 
-if [[ $IP ]] && [[ $LINES -ne 0 ]];then
-	echo "you cannot use -n with -i"
+if [[ $COMMAND && $IP ]];then
+	echo "you cannot use -c with -i"
 	exit -1
 fi
 
@@ -102,17 +102,18 @@ if [[ $IP ]];then
 	fi
 fi
 
-if [[ $IP ]];then
-	TORUN="grep \"$IP\" $FILE | awk '{print \$4}' | sort -n | uniq -c | awk '{if(min==\"\"){min=max=\$1};if(\$1>max){max=\$1}; if(\$1<min){min=\$1}; sum+=\$1} END { print \"Avg req/s: \",sum/NR, \"\nMin req/s: \",min, \"\nMax req/s: \",max}'"
+## Start build command
+if [[ $LINES -eq 0 ]];then
+	TORUN="cat $FILE "
 else
+	TORUN="tail -n $LINES $FILE"
+fi
 
-	## Start build command
-	if [[ $LINES -eq 0 ]];then
-		TORUN="cat $FILE "
-	else
-		TORUN="tail -n $LINES $FILE"	
-	fi
-
+if [[ $IP ]];then
+	# Yes I'm grepping the cat :)
+	TORUN=$TORUN" | grep \"$IP\" | awk '{print \$4}' | sort -n | uniq -c | awk '{if(min==\"\"){min=max=\$1};if(\$1>max){max=\$1}; if(\$1<min){min=\$1}; sum+=\$1} END { print \"Avg req/s: \",sum/NR, \"\nMin req/s: \",min, \"\nMax req/s: \",max}'"
+	## End build command (-i)
+else
 	case "$COMMAND" in
 		"top-ips")
 			TORUN=$TORUN" | awk '{ print \$4 }' | cut -d':' -f1"
@@ -126,8 +127,7 @@ else
 	esac
 
 	TORUN=$TORUN' | sort | uniq -c | sort -gr'
-	## End build command
-
+	## End build command (-c)
 fi
 
 # Run the command and display the output
