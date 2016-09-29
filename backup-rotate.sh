@@ -68,7 +68,6 @@ SHIFTERRORS=0
 rm -Rf $BACKUPDIR/d$(printf "%02d" $RETENTION)
 if [ $? -ne 0 ];then ((SHIFTERRORS++)); fi
 for i in $(seq -f "%02g" $RETENTION -1 2); do
-	#mv $BACKUPDIR/d$(($i-1)) $BACKUPDIR/d$i
 	mv $BACKUPDIR/d$(printf "%02d" $(( ${i#0} -1 ))) $BACKUPDIR/d$i
 	if [ $? -ne 0 ];then ((SHIFTERRORS++)); fi
 done
@@ -79,4 +78,3 @@ if [ $SHIFTERRORS -ne 0 ];then
 else
 	log "Directories successfully shifted, ready for next full backup!"
 fi
-
